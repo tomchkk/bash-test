@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-echo "Bash Test - 0.0.0" && echo
+echo "Bash Test - $(git describe --always --first-parent HEAD)" && echo
 
 __bash_test_dir="$(dirname ${BASH_SOURCE[0]})"
 __bash_test_args=(
