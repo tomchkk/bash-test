@@ -1,0 +1,125 @@
+#!/usr/bin/env bash
+
+__bash_test_failures_actual=()
+__bash_test_failures_expected=()
+
+__bash_test_bash_assert=${1:?"Bash Assert is required"}
+
+##
+# Run the tests found in the given path.
+##
+bash_test::run() {
+    local path=${1:?"A test path or script is required"}
+    local filter=${@:2}
+
+    if [[ ! -e "$path" ]]; then
+        echo "The path '$path' does not exist!"
+
+        return 1
+    fi
+
+    source "$__bash_test_bash_assert"
+
+    __bash_test::run_tests "$path" "$filter"
+
+    __bash_test::print_failures
+}
+
+##
+# Runs the test functions found in the given script.
+##
+__bash_test::run_tests() {
+    local path=$1
+    local filter=${@:2}
+
+    if [[ -d "$path" ]]; then
+        for file in $(find "$path" -type f | grep test$); do
+            __bash_test::run_tests "$file"
+        done
+
+        return 0
+    fi
+
+    source $path
+
+    local test_func
+    for test_func in $(__bash_test::get_script_tests "$path"); do
+        $test_func
+    done
+}
+
+##
+# Handles a passing test result.
+##
+bash_test::pass() {
+    __bash_test::print_result "."
+}
+
+##
+# Handles a failing test result.
+##
+bash_test::fail() {
+    local expected=${1:?"An expected value must be set"}
+    local actual=${2:?"An actual value must be set"}
+
+    __bash_test_failures_expected+=("$expected")
+    __bash_test_failures_actual+=("$actual")
+
+    __bash_test::print_result "F"
+}
+
+##
+# Gets the test functions defined in a script.
+##
+__bash_test::get_script_tests() {
+    local script=$1
+
+    local file=$(basename "$script")
+    local pattern="^${file/-/_}::test_.+$"
+
+    echo $(bash -c "source $script; compgen -A function" | grep -E $pattern)
+}
+
+##
+# Prints a test result indicator.
+##
+__bash_test::print_result() {
+    echo -ne "$1"
+}
+
+##
+# Prints test failure feeedback.
+##
+__bash_test::print_failures() {
+    if [[ ${#__bash_test_failures_expected[@]} -eq 0 ]]; then
+        return 0
+    fi
+
+    echo
+
+    for key in ${!__bash_test_failures_expected[@]}; do
+        local failures=(
+            "${__bash_test_failures_expected[$key]}"
+            "${__bash_test_failures_actual[$key]}"
+        )
+        __bash_test::print_failure "${failures[@]}"
+    done
+}
+
+##
+# Prints the actual failure feedback.
+##
+__bash_test::print_failure() {
+    local expected=$1
+    local actual=$2
+
+    cat <<MESSAGE
+
+Error:
+* Actual (-)
+ - $actual
+* Expected (+)
+ + $expected
+
+MESSAGE
+}

@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+
+echo "Bash Test - 0.0.0" && echo
+
+__bash_test_dir="$(dirname ${BASH_SOURCE[0]})"
+__bash_test_args=(
+    "$__bash_test_dir/src/bash-assert"
+    "$bash_clash"
+)
+
+source "$__bash_test_dir/src/bash-test" "${__bash_test_args[@]}"
+
+bash_test::run $@
+
+echo
