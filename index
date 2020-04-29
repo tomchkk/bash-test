@@ -1,11 +1,14 @@
 #!/usr/bin/env bash
 
+# TODO:
+# - source ./submodules/autoload
+
 echo "Bash Test - $(git describe --always --first-parent HEAD)" && echo
 
 __bash_test_dir="$(dirname ${BASH_SOURCE[0]})"
 __bash_test_args=(
     "$__bash_test_dir/src/bash-assert"
-    "$bash_clash"
+    # "$tomchkk_bash_clash"
 )
 
 source "$__bash_test_dir/src/bash-test" "${__bash_test_args[@]}"
