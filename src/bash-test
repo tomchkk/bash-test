@@ -4,12 +4,33 @@ __bash_test_failures_actual=()
 __bash_test_failures_expected=()
 
 __bash_test_bash_assert=${1:?"Bash Assert is required"}
+__bash_test_bash_clash=${2:?"Bash Clash is required"}
+
+##
+# Handles a passing test result.
+##
+bash_test::pass() {
+    __bash_test::print_result "."
+}
+
+##
+# Handles a failing test result.
+##
+bash_test::fail() {
+    local expected=${1:?"An expected value must be set"}
+    local actual=${2:?"An actual value must be set"}
+
+    __bash_test_failures_expected+=("$expected")
+    __bash_test_failures_actual+=("$actual")
+
+    __bash_test::print_result "F"
+}
 
 ##
 # Run the tests found in the given path.
 ##
 bash_test::run() {
-    local path=${1:?"A test path or script is required"}
+    local path=${1:?"A test path or script file is required"}
     local filter=${@:2}
 
     if [[ ! -e "$path" ]]; then
@@ -33,8 +54,9 @@ __bash_test::run_tests() {
     local filter=${@:2}
 
     if [[ -d "$path" ]]; then
+        local file
         for file in $(find "$path" -type f | grep test$); do
-            __bash_test::run_tests "$file"
+            __bash_test::run_tests "$file" "$filter"
         done
 
         return 0
@@ -42,49 +64,14 @@ __bash_test::run_tests() {
 
     source $path
 
+    # TODO:
+    # - handle filter(s?), probably here, with:
+    source $__bash_test_bash_clash "$filter"
+
     local test_func
     for test_func in $(__bash_test::get_script_tests "$path"); do
         $test_func
     done
-}
-
-##
-# Handles a passing test result.
-##
-bash_test::pass() {
-    __bash_test::print_result "."
-}
-
-##
-# Handles a failing test result.
-##
-bash_test::fail() {
-    local expected=${1:?"An expected value must be set"}
-    local actual=${2:?"An actual value must be set"}
-
-    __bash_test_failures_expected+=("$expected")
-    __bash_test_failures_actual+=("$actual")
-
-    __bash_test::print_result "F"
-}
-
-##
-# Gets the test functions defined in a script.
-##
-__bash_test::get_script_tests() {
-    local script=$1
-
-    local file=$(basename "$script")
-    local pattern="^${file/-/_}::test_.+$"
-
-    echo $(bash -c "source $script; compgen -A function" | grep -E $pattern)
-}
-
-##
-# Prints a test result indicator.
-##
-__bash_test::print_result() {
-    echo -ne "$1"
 }
 
 ##
@@ -104,6 +91,25 @@ __bash_test::print_failures() {
         )
         __bash_test::print_failure "${failures[@]}"
     done
+}
+
+##
+# Gets the test functions defined in a script.
+##
+__bash_test::get_script_tests() {
+    local script=$1
+
+    local file=$(basename "$script")
+    local pattern="^${file/-/_}::test_.+$"
+
+    echo $(bash -c "source $script; compgen -A function" | grep -E $pattern)
+}
+
+##
+# Prints a test result indicator.
+##
+__bash_test::print_result() {
+    echo -ne "$1"
 }
 
 ##
