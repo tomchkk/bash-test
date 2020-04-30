@@ -4,4 +4,4 @@
 	branch = master
 	super = self
 [self]
-	bin = ./bin/bash-test
+	bin = bin/bash-test
