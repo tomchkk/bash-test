@@ -1,10 +1,17 @@
 #!/usr/bin/env bash
 
-echo "Bash Test - $(git describe --always --first-parent HEAD)" && echo
+__bash_test_dir="${1:?"The app directory is required"}"
+__bash_test_autoloader="${2:?"The autoloader path is required"}"
+__bash_test_run_args=${@:3}
 
-source ./submodules/autoload
+__bash_test_version="$(
+    cd "$__bash_test_dir"
+    git describe --always --first-parent HEAD || echo "v0.0.0"
+)"
 
-__bash_test_dir="$(dirname ${BASH_SOURCE[0]})"
+echo "Bash Test - $__bash_test_version" && echo
+
+source "$__bash_test_autoloader"
 
 __bash_test_args=(
     "$__bash_test_dir/src/bash-assert"
@@ -12,6 +19,6 @@ __bash_test_args=(
 )
 source "$__bash_test_dir/src/bash-test" "${__bash_test_args[@]}"
 
-bash_test::run $@
+bash_test::run $__bash_test_run_args
 
 echo
