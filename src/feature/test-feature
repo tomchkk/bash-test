@@ -1,0 +1,36 @@
+#!/usr/bin/env bash
+
+__test_feature_bash_clash="${1:?"Bash Clash is required"}"
+
+source "$SERVICE/bash-test" "$SERVICE/bash-assert" "$__test_feature_bash_clash"
+
+##
+# Runs tests in the given path and filter.
+##
+test_feature::test() {
+    local path=${1:?"A file or directory is required"}
+    local filter=${2}
+
+    __test_feature::print_header
+    bash_test::run $path $filter
+    __test_feature::print_footer
+}
+
+##
+# Prints test run header.
+##
+__test_feature::print_header() {
+    cat <<HEAD
+$APP_NAME - $APP_VERSION
+
+HEAD
+}
+
+##
+# Prints test run footer.
+##
+__test_feature::print_footer() {
+    cat <<FOOT
+
+FOOT
+}

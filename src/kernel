@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+
+COMMAND="$__bash_test_src/command"
+FEATURE="$__bash_test_src/feature"
+SERVICE="$__bash_test_src/service"
+
+source "$COMMAND/app-command" $@

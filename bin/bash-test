@@ -33,7 +33,7 @@ bash_test_bin::main() {
         return 1
     fi
 
-    source "$app_dir/index" "$app_dir" "$autoloader" $@
+    source "$app_dir/bash-test" "$app_dir" "$autoloader" $@
 }
 
 bash_test_bin::main $@

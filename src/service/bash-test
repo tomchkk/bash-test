@@ -1,0 +1,196 @@
+#!/usr/bin/env bash
+
+__bash_test_failures_actual=()
+__bash_test_failures_expected=()
+
+__bash_test_bash_assert=${1:?"Bash Assert is required"}
+__bash_test_bash_clash=${2:?"Bash Clash is required"}
+
+##
+# Handles a passing test result.
+##
+bash_test::pass() {
+    __bash_test::print_result "."
+}
+
+##
+# Handles a failing test result.
+##
+bash_test::fail() {
+    local expected=${1:?"An expected value must be set"}
+    local actual=${2:?"An actual value must be set"}
+
+    __bash_test_failures_expected+=("$expected")
+    __bash_test_failures_actual+=("$actual")
+
+    __bash_test::print_result "F"
+}
+
+##
+# Run the tests found in the given path.
+##
+bash_test::run() {
+    local path=${1:?"A test path or script file is required"}
+    local options=${@:2}
+
+    if [[ ! -e "$path" ]]; then
+        echo "The path '$path' does not exist!"
+
+        return 1
+    fi
+
+    source "$__bash_test_bash_assert"
+
+    __bash_test::run_tests "$path" "$options"
+
+    __bash_test::print_failures
+}
+
+##
+# Runs the test functions found in the given script.
+##
+__bash_test::run_tests() {
+    local path=$1
+    local options=${@:2}
+
+    if [[ -d "$path" ]]; then
+        local file
+        for file in $(find "$path" -type f | grep test$); do
+            __bash_test::run_tests "$file" "$options"
+        done
+
+        return 0
+    fi
+
+    local test_func
+    local filter=$(__bash_test::parse_from_options "filter" "$options")
+    local prefix=$(__bash_test::get_script_prefix "$path")
+
+    source $path
+
+    for test_func in $(__bash_test::get_script_tests "$path"); do
+        if [[ -z "$filter" ]] || [[ "$test_func" =~ $filter ]]; then
+            __bash_test::before_each "$prefix"
+            $test_func
+            __bash_test::after_each "$prefix"
+        fi
+    done
+}
+
+##
+# Prints test failure feeedback.
+##
+__bash_test::print_failures() {
+    if [[ ${#__bash_test_failures_expected[@]} -eq 0 ]]; then
+        return 0
+    fi
+
+    echo
+
+    for key in ${!__bash_test_failures_expected[@]}; do
+        local failures=(
+            "${__bash_test_failures_expected[$key]}"
+            "${__bash_test_failures_actual[$key]}"
+        )
+        __bash_test::print_failure "${failures[@]}"
+    done
+}
+
+##
+# Gets the test function names defined in a script.
+##
+__bash_test::get_script_tests() {
+    local script="${1:?"A script path is required"}"
+
+    local prefix=$(__bash_test::get_script_prefix "$script")
+    local pattern="^${prefix}::test_.+$"
+
+    echo $(bash -c "source $script; compgen -A function" | grep -E $pattern)
+}
+
+##
+# Parses the requested option from the given options arguments.
+##
+__bash_test::parse_from_options() {
+    local option="${1:?"An option to parse is required"}"
+    local options=${@:2}
+
+    echo $(
+        source $__bash_test_bash_clash "$options"
+        echo $(bash_clash::get "$option")
+    )
+}
+
+##
+# Gets the expected script prefix - i.e.: the script file name in snake case.
+##
+__bash_test::get_script_prefix() {
+    local script="${1:?"A script path is required"}"
+    local file=$(basename "$script")
+
+    echo ${file/-/_}
+}
+
+##
+# Runs the 'before_each' function, if it exists.
+##
+__bash_test::before_each() {
+    local prefix="${1:?"A script prefix is required"}"
+    local func=${prefix}::before_each
+
+    if ! $(__bash_test::function_exists "$func"); then
+        return 0
+    fi
+
+    $func
+}
+
+##
+# Runs the 'after_each' function, if it exists.
+##
+__bash_test::after_each() {
+    local prefix="${1:?"A script prefix is required"}"
+    local func=${prefix}::after_each
+
+    if ! $(__bash_test::function_exists "$func"); then
+        return 0
+    fi
+
+    $func
+}
+
+##
+# Determines if a given function name exists in the current scope.
+##
+__bash_test::function_exists() {
+    local function="${1:?"A function name is required"}"
+
+    return $(declare -F "$function" >/dev/null; echo $?)
+}
+
+##
+# Prints a test result indicator.
+##
+__bash_test::print_result() {
+    echo -ne "$1"
+}
+
+##
+# Prints the actual failure feedback.
+##
+__bash_test::print_failure() {
+    # do not be tempted to make these required arguments, as they may be
+    # undefined as a result of the test
+    local expected=$1
+    local actual=$2
+
+    cat <<MESSAGE
+
+Error:
+* Actual (-)
+ - $actual
+* Expected (+)
+ + $expected
+
+MESSAGE
+}

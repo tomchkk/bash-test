@@ -1,0 +1,57 @@
+#!/usr/bin/env bash
+
+source "$FEATURE/test-feature" "$tomchkk_private_projects_bash_clash/src/index"
+
+##
+# Cats the command's usage documentation.
+##
+__app_command::usage() {
+    cat << EOF
+
+$APP_NAME ($APP_VERSION)
+
+A test-running suite for Bash.
+
+Usage:  $APP_NAME [options] <path|directory>
+
+Options:
+    -f, --filter <pattern>     Filter which tests to run
+    -h, --help                 Print usage information
+
+EOF
+}
+
+##
+# Handles incoming command requests.
+##
+__app_command::handle() {
+    local filter
+    local path
+
+    while [[ "$#" -gt 0 ]]; do
+        case $1 in
+            -f|--filter)
+                filter="--filter=$2" && shift
+            ;;
+            -h|-*|--help|--*)
+                __app_command::usage && return 0
+            ;;
+            *)
+                path="$1"
+            ;;
+        esac
+
+        shift
+    done
+
+    if [[ -z "$path" ]] || [[ ! -e "$path" ]]; then
+        __app_command::usage && return 0
+    fi
+
+    test_feature::test $path $filter
+}
+
+# handle empty args
+[[ -z "$@" ]] && set -- "--help"
+
+__app_command::handle $@
