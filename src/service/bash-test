@@ -1,10 +1,12 @@
 #!/usr/bin/env bash
 
-__bash_test_failures_actual=()
-__bash_test_failures_expected=()
-
 __bash_test_bash_assert=${1:?"Bash Assert is required"}
 __bash_test_bash_clash=${2:?"Bash Clash is required"}
+
+__bash_test_current=""
+__bash_test_failures_stack=()
+__bash_test_failures_actual=()
+__bash_test_failures_expected=()
 
 ##
 # Handles a passing test result.
@@ -20,6 +22,7 @@ bash_test::fail() {
     local expected=${1:?"An expected value must be set"}
     local actual=${2:?"An actual value must be set"}
 
+    __bash_test_failures_stack+=("$__bash_test_current")
     __bash_test_failures_expected+=("$expected")
     __bash_test_failures_actual+=("$actual")
 
@@ -76,11 +79,22 @@ __bash_test::run_tests() {
                 continue
             fi
 
+            __bash_test::set_current_test "$test_func"
+
             __bash_test::before_each "$prefix"
             $test_func
             __bash_test::after_each "$prefix"
         fi
     done
+}
+
+##
+# Sets the name of the currently running test script/function.
+##
+__bash_test::set_current_test() {
+    local func="${1:?"A running function is required"}"
+
+    __bash_test_current="$func"
 }
 
 ##
@@ -94,11 +108,13 @@ __bash_test::print_failures() {
     echo
 
     for key in ${!__bash_test_failures_expected[@]}; do
-        local failures=(
+        local params=(
+            "${__bash_test_failures_stack[$key]}"
             "${__bash_test_failures_expected[$key]}"
             "${__bash_test_failures_actual[$key]}"
         )
-        __bash_test::print_failure "${failures[@]}"
+
+        __bash_test::print_failure "${params[@]}"
     done
 }
 
@@ -187,12 +203,13 @@ __bash_test::print_result() {
 __bash_test::print_failure() {
     # do not be tempted to make these required arguments, as they may be
     # undefined as a result of the test
-    local expected=$1
-    local actual=$2
+    local script=$1
+    local expected=$2
+    local actual=$3
 
     cat <<MESSAGE
 
-Error:
+Error in '$script':
 * Actual (-)
  - $actual
 * Expected (+)
