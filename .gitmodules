@@ -4,4 +4,5 @@
 	branch = master
 	super = self
 [self]
+	install = make
 	bin = bin/bash-test
