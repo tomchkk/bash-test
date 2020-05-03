@@ -62,14 +62,20 @@ __bash_test::run_tests() {
         return 0
     fi
 
-    local test_func
     local filter=$(__bash_test::parse_from_options "filter" "$options")
+    local exclude$(__bash_test::parse_from_options "exclude" "$options")
+
     local prefix=$(__bash_test::get_script_prefix "$path")
 
     source $path
 
+    local test_func
     for test_func in $(__bash_test::get_script_tests "$path"); do
         if [[ -z "$filter" ]] || [[ "$test_func" =~ $filter ]]; then
+            if [[ "$test_func" =~ $exclude ]]; then
+                continue
+            fi
+
             __bash_test::before_each "$prefix"
             $test_func
             __bash_test::after_each "$prefix"

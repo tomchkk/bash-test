@@ -15,8 +15,9 @@ A test-running suite for Bash.
 Usage:  $APP_NAME [options] <path|directory>
 
 Options:
-    -f, --filter <pattern>     Filter which tests to run
-    -h, --help                 Print usage information
+    -e, --exclude <pattern>     Exclude tests from a test run
+    -f, --filter <pattern>      Filter tests in a test run
+    -h, --help                  Print usage information
 
 EOF
 }
@@ -25,11 +26,15 @@ EOF
 # Handles incoming command requests.
 ##
 __app_command::handle() {
+    local exclude
     local filter
     local path
 
     while [[ "$#" -gt 0 ]]; do
         case $1 in
+            -e|--exclude)
+                exclude="--exclude=$2" && shift
+            ;;
             -f|--filter)
                 filter="--filter=$2" && shift
             ;;
@@ -48,7 +53,7 @@ __app_command::handle() {
         __app_command::usage && return 0
     fi
 
-    test_feature::test $path $filter
+    test_feature::test $path $filter $exclude
 }
 
 # handle empty args

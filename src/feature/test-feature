@@ -10,9 +10,10 @@ source "$SERVICE/bash-test" "$SERVICE/bash-assert" "$__test_feature_bash_clash"
 test_feature::test() {
     local path=${1:?"A file or directory is required"}
     local filter=${2}
+    local exclude=${3}
 
     __test_feature::print_header
-    bash_test::run $path $filter
+    bash_test::run $path $filter $exclude
     __test_feature::print_footer
 }
 
