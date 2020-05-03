@@ -63,7 +63,7 @@ __bash_test::run_tests() {
     fi
 
     local filter=$(__bash_test::parse_from_options "filter" "$options")
-    local exclude$(__bash_test::parse_from_options "exclude" "$options")
+    local exclude=$(__bash_test::parse_from_options "exclude" "$options")
 
     local prefix=$(__bash_test::get_script_prefix "$path")
 
