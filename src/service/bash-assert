@@ -4,10 +4,10 @@
 # Tests that the give parameters are equivalent.
 ##
 bash_assert::assert_equals() {
-    local expected=${1:?"An expected value must be set"}
-    local actual=${2:?"An actual value must be set"}
+    local expected="${1:?"An expected value must be set"}"
+    local actual="${2}"
 
-    if [[ $expected == $actual ]]; then
+    if [[ "$expected" == "$actual" ]]; then
         bash_test::pass
 
         return 0

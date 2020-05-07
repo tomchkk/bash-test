@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
-__bash_test_bash_assert=${1:?"Bash Assert is required"}
-__bash_test_bash_clash=${2:?"Bash Clash is required"}
+__bash_test_bash_assert="${1:?"Bash Assert is required"}"
+__bash_test_bash_clash="${2:?"Bash Clash is required"}"
 
 __bash_test_current=""
 __bash_test_failures_stack=()
@@ -19,8 +19,8 @@ bash_test::pass() {
 # Handles a failing test result.
 ##
 bash_test::fail() {
-    local expected=${1:?"An expected value must be set"}
-    local actual=${2:?"An actual value must be set"}
+    local expected="${1:?"An expected value must be set"}"
+    local actual="${2:-"~"}"
 
     __bash_test_failures_stack+=("$__bash_test_current")
     __bash_test_failures_expected+=("$expected")
@@ -33,8 +33,8 @@ bash_test::fail() {
 # Run the tests found in the given path.
 ##
 bash_test::run() {
-    local path=${1:?"A test path or script file is required"}
-    local options=${@:2}
+    local path="${1:?"A test path or script file is required"}"
+    local options="${@:2}"
 
     if [[ ! -e "$path" ]]; then
         echo "The path '$path' does not exist!"
@@ -53,8 +53,8 @@ bash_test::run() {
 # Runs the test functions found in the given script.
 ##
 __bash_test::run_tests() {
-    local path=$1
-    local options=${@:2}
+    local path="$1"
+    local options="${@:2}"
 
     if [[ -d "$path" ]]; then
         local file
@@ -82,7 +82,7 @@ __bash_test::run_tests() {
             __bash_test::set_current_test "$test_func"
 
             __bash_test::before_each "$prefix"
-            $test_func
+            "$test_func"
             __bash_test::after_each "$prefix"
         fi
     done
@@ -125,9 +125,9 @@ __bash_test::get_script_tests() {
     local script="${1:?"A script path is required"}"
 
     local prefix=$(__bash_test::get_script_prefix "$script")
-    local pattern="^${prefix}::test_.+$"
+    local pattern="^"${prefix}"::test_.+$"
 
-    echo $(bash -c "source $script; compgen -A function" | grep -E $pattern)
+    echo $(bash -c "source $script; compgen -A function" | grep -E "$pattern")
 }
 
 ##
@@ -135,7 +135,7 @@ __bash_test::get_script_tests() {
 ##
 __bash_test::parse_from_options() {
     local option="${1:?"An option to parse is required"}"
-    local options=${@:2}
+    local options="${@:2}"
 
     echo $(
         source $__bash_test_bash_clash "$options"
@@ -150,7 +150,7 @@ __bash_test::get_script_prefix() {
     local script="${1:?"A script path is required"}"
     local file=$(basename "$script")
 
-    echo ${file/-/_}
+    echo ${file//-/_}
 }
 
 ##
@@ -158,13 +158,13 @@ __bash_test::get_script_prefix() {
 ##
 __bash_test::before_each() {
     local prefix="${1:?"A script prefix is required"}"
-    local func=${prefix}::before_each
+    local func="${prefix}"::before_each
 
     if ! $(__bash_test::function_exists "$func"); then
         return 0
     fi
 
-    $func
+    "$func"
 }
 
 ##
@@ -172,13 +172,13 @@ __bash_test::before_each() {
 ##
 __bash_test::after_each() {
     local prefix="${1:?"A script prefix is required"}"
-    local func=${prefix}::after_each
+    local func="${prefix}"::after_each
 
     if ! $(__bash_test::function_exists "$func"); then
         return 0
     fi
 
-    $func
+   "$func"
 }
 
 ##
@@ -203,17 +203,17 @@ __bash_test::print_result() {
 __bash_test::print_failure() {
     # do not be tempted to make these required arguments, as they may be
     # undefined as a result of the test
-    local script=$1
-    local expected=$2
-    local actual=$3
+    local script="$1"
+    local expected="$2"
+    local actual="$3"
 
     cat <<MESSAGE
 
 Error in '$script':
 * Actual (-)
- - $actual
+ - '$actual'
 * Expected (+)
- + $expected
+ + '$expected'
 
 MESSAGE
 }
