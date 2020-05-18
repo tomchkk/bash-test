@@ -53,7 +53,7 @@ __app_command::handle() {
         __app_command::usage && return 0
     fi
 
-    test_feature::test $path $filter $exclude
+    test_feature::test "$path" "$filter" "$exclude"
 }
 
 # handle empty args

@@ -137,10 +137,13 @@ __bash_test::parse_from_options() {
     local option="${1:?"An option to parse is required"}"
     local options="${@:2}"
 
-    echo $(
-        source $__bash_test_bash_clash "$options"
-        echo $(bash_clash::get "$option")
-    )
+    for item in ${options[@]}; do
+        if [[ "$item" =~ ^"--$option="(.*)$ ]]; then
+            echo "${BASH_REMATCH[1]}"
+
+            return 0
+        fi
+    done
 }
 
 ##
