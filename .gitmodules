@@ -1,0 +1,3 @@
+[self]
+	bin = bin/bash-test
+	install = make
