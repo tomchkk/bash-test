@@ -1,7 +1,6 @@
 #!/usr/bin/env bash
 
-__bash_test_bash_assert="${1:?"Bash Assert is required"}"
-__bash_test_bash_clash="${2:?"Bash Clash is required"}"
+__bash_test_bash_assert="$SERVICE/bash-assert"
 
 __bash_test_current=""
 __bash_test_failures_stack=()

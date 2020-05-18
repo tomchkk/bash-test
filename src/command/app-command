@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-source "$FEATURE/test-feature" "$tomchkk_private_projects_bash_clash/src/index"
+source "$FEATURE/test-feature"
 
 ##
 # Cats the command's usage documentation.

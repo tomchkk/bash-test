@@ -1,8 +1,7 @@
 #!/usr/bin/env bash
 
 __bash_test_dir="${1:?"The app directory is required"}"
-__bash_test_autoloader="${2:?"The autoloader path is required"}"
-__bash_test_args=${@:3}
+__bash_test_args=${@:2}
 
 APP_VERSION="$(
     cd "$__bash_test_dir"
@@ -12,8 +11,6 @@ APP_VERSION="$(
 source "$__bash_test_dir/.env"
 
 APP_NAME="${APP_NAME:-$(basename ${BASH_SOURCE[0]})}"
-
-source "$__bash_test_autoloader"
 
 __bash_test_src="$__bash_test_dir/src"
 

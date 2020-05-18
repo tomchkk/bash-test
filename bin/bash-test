@@ -1,39 +1,13 @@
 #!/usr/bin/env bash
 
 ##
-# Gets an absolute path to the Submarine autoloader file.
-##
-__bash_test_bin::find_autoloader() {
-    local autoloader
-    local autoload_path autoload_paths=(".." "../.." "../../.." "../../../..")
-
-    for autoload_path in ${autoload_paths[@]}; do
-        autoload_path=$(cd $(dirname ${BASH_SOURCE[0]})/$autoload_path; pwd)
-
-        if [[ -f "$autoload_path/autoload" ]]; then
-            autoloader="$autoload_path/autoload" && break
-        fi
-    done
-
-    echo "$autoloader"
-}
-
-##
 # Starts the main process
 ##
 bash_test_bin::main() {
     local script=$(readlink ${BASH_SOURCE[0]} || echo ${BASH_SOURCE[0]})
     local app_dir="$(cd $(dirname "$script"); pwd)/.."
 
-    local autoloader="$(__bash_test_bin::find_autoloader)"
-
-    if [[ -z "$autoloader" ]]; then
-        echo "The Submarine autoload file could not be found!" >&2
-
-        return 1
-    fi
-
-    source "$app_dir/bash-test" "$app_dir" "$autoloader" $@
+    source "$app_dir/bash-test" "$app_dir" $@
 }
 
 bash_test_bin::main $@

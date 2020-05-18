@@ -1,8 +1,6 @@
 #!/usr/bin/env bash
 
-__test_feature_bash_clash="${1:?"Bash Clash is required"}"
-
-source "$SERVICE/bash-test" "$SERVICE/bash-assert" "$__test_feature_bash_clash"
+source "$SERVICE/bash-test"
 
 ##
 # Runs tests in the given path and filter.
