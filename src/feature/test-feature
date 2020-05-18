@@ -8,12 +8,11 @@ source "$SERVICE/bash-test" "$SERVICE/bash-assert" "$__test_feature_bash_clash"
 # Runs tests in the given path and filter.
 ##
 test_feature::test() {
-    local path=${1:?"A file or directory is required"}
-    local filter=${2}
-    local exclude=${3}
+    local path="${1:?"A file or directory is required"}"
+    local options="${@:2}"
 
     __test_feature::print_header
-    bash_test::run $path $filter $exclude
+    bash_test::run $path ${options[@]}
     __test_feature::print_footer
 }
 
