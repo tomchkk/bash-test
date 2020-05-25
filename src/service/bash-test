@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 
 __bash_test_bash_assert="$SERVICE/bash-assert"
+__bash_test_bash_mock="$SERVICE/bash-mock"
 
 __bash_test_current=""
 __bash_test_failures_stack=()
@@ -79,6 +80,9 @@ __bash_test::run_tests() {
             fi
 
             __bash_test::set_current_test "$test_func"
+
+            # re-source any mocks between each test function
+            source "$__bash_test_bash_mock"
 
             __bash_test::before_each "$prefix"
             "$test_func"
