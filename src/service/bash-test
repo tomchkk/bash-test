@@ -216,10 +216,10 @@ __bash_test::print_failure() {
     cat <<MESSAGE
 
 Error in '$script':
-* Actual (-)
- - '$actual'
 * Expected (+)
  + '$expected'
+* Actual (-)
+ - '$actual'
 
 MESSAGE
 }
