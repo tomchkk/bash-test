@@ -3,7 +3,7 @@
 ##
 # Tests that the given parameters are equivalent.
 ##
-bash_assert::assert_equals() {
+bash_test::assert_equals() {
     local expected="${1:?"An expected value must be set"}"
     local actual="${2}"
 
