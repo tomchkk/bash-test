@@ -1,27 +1,20 @@
 #!/usr/bin/env bash
 
-__bash_test_mock_echo_val=""
-__bash_test_mock_return_val=
-
 ##
 # Mocks the return value of a given function.
 ##
 bash_test::mock() {
     local mock="${1:?"A method name to mock is required"}"
 
-    __bash_test_mock_echo_val="$2"
-    __bash_test_mock_return_val=$3
-
     ##
     # Defines the mocking function with available values.
     ##
-    __bash_test::mock() {
-        echo "$__bash_test_mock_echo_val"
-        return $__bash_test_mock_return_val
-    }
+    __bash_test::mock() { echo "{{2}}" && return {{3}}; }
 
     # redefine the mocking function with the given mocked function name
     eval "$(
-        declare -f __bash_test::mock | sed "s/^__bash_test::mock/$mock/"
+        declare -f __bash_test::mock \
+            | sed "s/^__bash_test::mock/$mock/" \
+            | sed "s/{{2}}/${2}/;s/{{3}}/${3}/"
     )"
 }
