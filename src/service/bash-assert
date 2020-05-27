@@ -31,7 +31,7 @@ bash_test::assert_contains() {
         return 0
     fi
 
-    bash_test::fail "0" "1"
+    bash_test::fail "*$substring*" "$string"
 
     return 1
 }
