@@ -35,3 +35,21 @@ bash_test::assert_contains() {
 
     return 1
 }
+
+##
+# Tests that the given string does _not_ contain the given substring.
+##
+bash_test::assert_not_contains() {
+    local string="${1:?"A string to search is required"}"
+    local substring="${2:?"A substring to find is required"}"
+
+    if [[ "$string" == *"$substring"* ]]; then
+        bash_test::fail "*$substring*" "$string"
+
+        return 1
+    fi
+
+    bash_test::pass
+
+    return 0
+}
