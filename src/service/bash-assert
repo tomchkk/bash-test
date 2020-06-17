@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 ##
-# Tests that the given parameters are equivalent.
+# Asserts that the given parameters are equivalent.
 ##
 bash_test::assert_equals() {
     local expected="${1:?"An expected value must be set"}"
@@ -19,7 +19,7 @@ bash_test::assert_equals() {
 }
 
 ##
-# Tests that the given string contains the given substring.
+# Asserts that the given string contains the given substring.
 ##
 bash_test::assert_contains() {
     local string="${1:?"A string to search is required"}"
@@ -37,7 +37,7 @@ bash_test::assert_contains() {
 }
 
 ##
-# Tests that the given string does _not_ contain the given substring.
+# Asserts that the given string does _not_ contain the given substring.
 ##
 bash_test::assert_not_contains() {
     local string="${1:?"A string to search is required"}"
@@ -52,4 +52,21 @@ bash_test::assert_not_contains() {
     bash_test::pass
 
     return 0
+}
+
+##
+# Asserts that the given value is empty.
+##
+bash_test::assert_empty() {
+    local value="$1"
+
+    if [[ -z "$value" ]]; then
+        bash_test::pass
+
+        return 0
+    fi
+
+    bash_test::fail "" "$value"
+
+    return 1
 }
