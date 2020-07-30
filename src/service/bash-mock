@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 ##
-# Mocks the return value of a given function.
+# Mocks the output and return value of a given function.
 ##
 bash_test::mock() {
     local mock="${1:?"A method name to mock is required"}"
