@@ -3,10 +3,7 @@
 __bash_test_dir="${1:?"The app directory is required"}"
 __bash_test_args=${@:2}
 
-APP_VERSION="$(
-    cd "$__bash_test_dir"
-    git describe --always --first-parent HEAD 2>/dev/null || echo "v0.0.0"
-)"
+APP_VERSION="$(cat $__bash_test_dir/version)"
 
 source "$__bash_test_dir/.env"
 
