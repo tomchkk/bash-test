@@ -4,10 +4,16 @@
 # Starts the main process
 ##
 bash_test_bin::main() {
-    local script=$(readlink ${BASH_SOURCE[0]} || echo ${BASH_SOURCE[0]})
-    local app_dir="$(cd $(dirname "$script"); pwd)/.."
+    local __script=$(readlink ${BASH_SOURCE[0]} || echo ${BASH_SOURCE[0]})
+    local __app_dir=$(
+        # try first to cd to the source dir, in case $__script is relative
+        cd $(dirname ${BASH_SOURCE[0]}) 2>/dev/null
+        cd $(dirname "$__script") 2>/dev/null
+        cd ..
+        pwd
+    )
 
-    source "$app_dir/bash-test" "$app_dir" $@
+    source "$__app_dir/bash-test" "$__app_dir" $@
 }
 
 bash_test_bin::main $@
