@@ -12,6 +12,8 @@ test_feature::test() {
     __test_feature::print_header
     bash_test::run $path ${options[@]}
     __test_feature::print_footer
+
+    return $(bash_test::result)
 }
 
 ##

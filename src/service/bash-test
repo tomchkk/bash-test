@@ -50,6 +50,17 @@ bash_test::run() {
 }
 
 ##
+# Determines if a test run is considered successful or not.
+##
+bash_test::result() {
+    if [[ ${#__bash_test_failures_stack[@]} -gt 0 ]]; then
+        return 1
+    fi
+
+    return 0
+}
+
+##
 # Runs the test functions found in the given script.
 ##
 __bash_test::run_tests() {
