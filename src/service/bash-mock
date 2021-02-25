@@ -15,6 +15,6 @@ bash_test::mock() {
     eval "$(
         declare -f __bash_test::mock \
             | sed "s/^__bash_test::mock/$mock/" \
-            | sed "s/{{2}}/${2}/;s/{{3}}/${3}/"
+            | sed "s|{{2}}|${2}|;s|{{3}}|${3}|"
     )"
 }
